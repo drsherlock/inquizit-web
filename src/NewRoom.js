@@ -16,7 +16,6 @@ function NewRoomModal(props) {
   };
 
   const createRoom = async () => {
-    const data = { email: email, username: username };
     return await postReq({ url: "rooms" });
   };
 
