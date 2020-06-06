@@ -2,47 +2,22 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-
 import Cookies from "js-cookie";
+
+import { postReq } from "./reqUtil";
 
 function NewRoomModal(props) {
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
 
   const createUser = async () => {
-    const url = "http://localhost:8080/users";
-    try {
-      let response = await fetch(url, {
-        method: "post",
-        headers: {
-          "Content-type": "application/json",
-          Accept: "application/json"
-        },
-        body: JSON.stringify({ email: email, username: username })
-      });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.log("Request failed", error);
-    }
+    const data = { email: email, username: username };
+    return await postReq({ url: "users", data });
   };
 
   const createRoom = async () => {
-    const url = "http://localhost:8080/rooms";
-    try {
-      let response = await fetch(url, {
-        method: "post",
-        headers: {
-          "Content-type": "application/json",
-          Accept: "application/json"
-        },
-        credentials: "include"
-      });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.log("Request failed", error);
-    }
+    const data = { email: email, username: username };
+    return await postReq({ url: "rooms" });
   };
 
   const onNewUserFormSubmit = async event => {
