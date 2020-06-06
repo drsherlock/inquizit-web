@@ -3,28 +3,57 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 
+import Cookies from "js-cookie";
+
 function NewRoomModal(props) {
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
 
-  const onNewUserFormSubmit = event => {
-    event.preventDefault();
+  const createUser = async () => {
     const url = "http://localhost:8080/users";
-    fetch(url, {
-      method: "post",
-      headers: {
-        "Content-type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify({ email: email, username: username })
-    })
-      .then(response => response.json())
-      .then(function(data) {
-        console.log("Request succeeded with JSON response", data);
-      })
-      .catch(function(error) {
-        console.log("Request failed", error);
+    try {
+      let response = await fetch(url, {
+        method: "post",
+        headers: {
+          "Content-type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({ email: email, username: username })
       });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log("Request failed", error);
+    }
+  };
+
+  const createRoom = async () => {
+    const url = "http://localhost:8080/rooms";
+    try {
+      let response = await fetch(url, {
+        method: "post",
+        headers: {
+          "Content-type": "application/json",
+          Accept: "application/json"
+        },
+        credentials: "include"
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log("Request failed", error);
+    }
+  };
+
+  const onNewUserFormSubmit = async event => {
+    event.preventDefault();
+    try {
+      let user = await createUser();
+      Cookies.set("Authorization", user.token);
+      let room = await createRoom();
+    } catch (error) {
+      console.log("Request failed", error);
+    }
   };
 
   return (
