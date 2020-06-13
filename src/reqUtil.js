@@ -17,6 +17,6 @@ export const postReq = async reqObject => {
 
     return await response.json();
   } catch (error) {
-    console.log("Request failed", error);
+    return { error };
   }
 };

@@ -6,9 +6,12 @@ import Cookies from "js-cookie";
 
 import { postReq } from "./reqUtil";
 
+import Error from "./Error";
+
 function NewRoomModal(props) {
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
+  const [error, setError] = React.useState({ show: false, message: "" });
 
   const createUser = async () => {
     const data = { email: email, username: username };
@@ -23,9 +26,18 @@ function NewRoomModal(props) {
     event.preventDefault();
     try {
       let user = await createUser();
+      if (user.error) {
+        throw user.error;
+      }
+
       Cookies.set("Authorization", user.token);
+
       let room = await createRoom();
+      if (room.error) {
+        throw room.error;
+      }
     } catch (error) {
+      setError({ show: true, message: error });
       console.log("Request failed", error);
     }
   };
@@ -41,6 +53,7 @@ function NewRoomModal(props) {
         <Modal.Title id="contained-modal-title-vcenter">New Room</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <Error error={error} />
         <h4>Your Details Please...</h4>
         <Form onSubmit={event => onNewUserFormSubmit(event)}>
           <Form.Group controlId="email">
