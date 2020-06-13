@@ -2,7 +2,7 @@ import React from "react";
 // import logo from "./logo.svg";
 import "./Home.css";
 
-import NewRoom from "./NewRoom";
+import NewRoomButton from "./NewRoomButton";
 
 function Home() {
   return (
@@ -21,7 +21,7 @@ function Home() {
           Learn React
         </a>*/}
         <h2>Inquizit</h2>
-        <NewRoom />
+        <NewRoomButton />
       </header>
     </div>
   );

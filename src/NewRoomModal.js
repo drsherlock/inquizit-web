@@ -1,17 +1,20 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 import Cookies from "js-cookie";
+import { useHistory } from "react-router-dom";
 
 import { postReq } from "./reqUtil";
 
 import Error from "./Error";
 
-function NewRoomModal(props) {
+export default function NewRoomModal(props) {
   const [email, setEmail] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [error, setError] = React.useState({ show: false, message: "" });
+
+  let history = useHistory();
 
   const createUser = async () => {
     const data = { email: email, username: username };
@@ -36,6 +39,8 @@ function NewRoomModal(props) {
       if (room.error) {
         throw room.error;
       }
+
+      history.push(`/room/${room.roomId}`);
     } catch (error) {
       setError({ show: true, message: error });
       console.log("Request failed", error);
@@ -85,17 +90,3 @@ function NewRoomModal(props) {
     </Modal>
   );
 }
-
-function NewRoom() {
-  const [modalShow, setModalShow] = React.useState(false);
-  return (
-    <>
-      <Button variant="light" type="button" onClick={() => setModalShow(true)}>
-        New Room
-      </Button>
-      <NewRoomModal show={modalShow} onHide={() => setModalShow(false)} />
-    </>
-  );
-}
-
-export default NewRoom;
