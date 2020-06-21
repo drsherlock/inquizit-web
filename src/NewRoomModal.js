@@ -54,7 +54,7 @@ export default function NewRoomModal(props) {
       history.push(`/room/${room.roomId}`);
     } catch (error) {
       setError({ show: true, message: error });
-      console.log("Request failed", error);
+      console.log("Request failed: ", error);
     }
   };
 
@@ -77,7 +77,7 @@ export default function NewRoomModal(props) {
       joinRoom(room.roomId);
     } catch (error) {
       setError({ show: true, message: error });
-      console.log("Request failed", error);
+      console.log("Request failed: ", error);
     }
   };
 

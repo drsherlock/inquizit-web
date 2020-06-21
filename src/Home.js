@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Cookies from "js-cookie";
+import { useHistory } from "react-router-dom";
 
 import { getReq } from "./reqUtil";
 // import logo from "./logo.svg";
@@ -11,6 +12,12 @@ import NewRoomButton from "./NewRoomButton";
 
 function Home() {
   const [room, setRoom] = React.useState({ inRoom: false, roomId: "" });
+
+  let history = useHistory();
+
+  const joinRoom = roomId => {
+    history.push(`/room/${roomId}`);
+  };
 
   const getRoom = async () => {
     return await getReq({ url: "rooms" });
@@ -31,7 +38,7 @@ function Home() {
           }
         }
       } catch (error) {
-        console.log("Request failed", error);
+        console.log("Request failed: ", error);
       }
     })();
   }, []);
@@ -57,7 +64,7 @@ function Home() {
         {room.inRoom && (
           <>
             <h5>You are already in a room</h5>
-            <Button>Join</Button>
+            <Button onClick={e => joinRoom(room.roomId)}>Join</Button>
           </>
         )}
       </header>
