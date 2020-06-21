@@ -24,7 +24,7 @@ function Room() {
             </Form>
           </Col>
           <Col sm={4}>
-            <ListGroup id="userList">
+            <ListGroup className="User-list">
               <ListGroup.Item>Cras justo odio</ListGroup.Item>
               <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
               <ListGroup.Item>Morbi leo risus</ListGroup.Item>

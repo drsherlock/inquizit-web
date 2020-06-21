@@ -1,10 +1,41 @@
 import React from "react";
+import Button from "react-bootstrap/Button";
+import Cookies from "js-cookie";
+
+import { getReq } from "./reqUtil";
 // import logo from "./logo.svg";
+
 import "./Home.css";
 
 import NewRoomButton from "./NewRoomButton";
 
 function Home() {
+  const [room, setRoom] = React.useState({ inRoom: false, roomId: "" });
+
+  const getRoom = async () => {
+    return await getReq({ url: "rooms" });
+  };
+
+  React.useEffect(() => {
+    (async function checkUserInRoom() {
+      try {
+        const token = Cookies.get("Authorization");
+        if (token) {
+          const room = await getRoom();
+          if (room.error) {
+            throw room.error;
+          }
+
+          if (room.inRoom) {
+            setRoom({ inRoom: true, roomId: room.roomId });
+          }
+        }
+      } catch (error) {
+        console.log("Request failed", error);
+      }
+    })();
+  }, []);
+
   return (
     <div className="Home">
       <header className="Home-header">
@@ -22,6 +53,13 @@ function Home() {
         </a>*/}
         <h2>Inquizit</h2>
         <NewRoomButton />
+        <br />
+        {room.inRoom && (
+          <>
+            <h5>You are already in a room</h5>
+            <Button>Join</Button>
+          </>
+        )}
       </header>
     </div>
   );
