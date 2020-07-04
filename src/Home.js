@@ -11,6 +11,7 @@ import "./Home.css";
 import NewRoomButton from "./NewRoomButton";
 
 function Home() {
+  const [loginModal, setLoginModal] = React.useState(false);
   const [room, setRoom] = React.useState({ inRoom: false, roomId: "" });
 
   let history = useHistory();
@@ -28,6 +29,8 @@ function Home() {
       try {
         const token = Cookies.get("Authorization");
         if (token) {
+          // TODO: verify user
+
           const room = await getRoom();
           if (room.error) {
             throw room.error;
@@ -59,7 +62,12 @@ function Home() {
           Learn React
         </a>*/}
         <h2>Inquizit</h2>
-        <NewRoomButton />
+        <NewRoomButton
+          loginModal={loginModal}
+          setLoginModal={setLoginModal}
+          room={room}
+          setRoom={setRoom}
+        />
         <br />
         {room.inRoom && (
           <>

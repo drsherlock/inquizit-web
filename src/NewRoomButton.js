@@ -3,15 +3,14 @@ import Button from "react-bootstrap/Button";
 
 import NewRoomModal from "./NewRoomModal";
 
-function NewRoomButton() {
-  const [modalShow, setModalShow] = React.useState(false);
-
+function NewRoomButton(props) {
+  const { setLoginModal } = props;
   return (
     <>
-      <Button variant="light" type="button" onClick={() => setModalShow(true)}>
+      <Button variant="light" type="button" onClick={() => setLoginModal(true)}>
         New Room
       </Button>
-      <NewRoomModal show={modalShow} onHide={() => setModalShow(false)} />
+      <NewRoomModal {...props} />
     </>
   );
 }
