@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 
 import UserLogin from "./UserLogin";
 
-import { postReq } from "./reqUtil";
+import { createUser, createRoom, removeUserFromRoom } from "./actions";
 
 export default function NewRoomModal(props) {
   const { loginModal, setLoginModal, room } = props;
@@ -12,20 +12,6 @@ export default function NewRoomModal(props) {
   const [error, setError] = React.useState({ show: false, message: "" });
 
   let history = useHistory();
-
-  const createUser = async (email, username) => {
-    const data = { email: email, username: username };
-    return await postReq({ url: "users", data });
-  };
-
-  const createRoom = async () => {
-    return await postReq({ url: "rooms" });
-  };
-
-  const removeUserFromRoom = async roomId => {
-    const data = { roomId: roomId };
-    return await postReq({ url: "rooms/removeUser", data });
-  };
 
   const onNewUserFormSubmit = async (e, { email, username }) => {
     e.preventDefault();

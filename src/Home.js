@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Cookies from "js-cookie";
 import { useHistory } from "react-router-dom";
 
-import { getReq } from "./reqUtil";
+import { getRoom } from "./actions";
 // import logo from "./logo.svg";
 
 import "./Home.css";
@@ -18,10 +18,6 @@ function Home() {
 
   const joinRoom = roomId => {
     history.push(`/room/${roomId}`);
-  };
-
-  const getRoom = async () => {
-    return await getReq({ url: "rooms" });
   };
 
   React.useEffect(() => {

@@ -12,7 +12,12 @@ import LeaveRoomPrompt from "./LeaveRoomPrompt";
 import UserLogin from "./UserLogin";
 
 import config from "./config/development";
-import { getReq, postReq } from "./reqUtil";
+import {
+  verifyUser,
+  createUser,
+  removeUserFromRoom,
+  addUserToRoom
+} from "./actions";
 
 import "./Room.css";
 
@@ -49,25 +54,6 @@ function Room() {
       setError({ show: true, message: error });
       console.log("Request failed: ", error);
     }
-  };
-
-  const createUser = async (email, username) => {
-    const data = { email: email, username: username };
-    return await postReq({ url: "users", data });
-  };
-
-  const removeUserFromRoom = async roomId => {
-    const data = { roomId: roomId };
-    return await postReq({ url: "rooms/removeUser", data });
-  };
-
-  const addUserToRoom = async roomId => {
-    const data = { roomId: roomId };
-    return await postReq({ url: "rooms/addUser", data });
-  };
-
-  const verifyUser = async () => {
-    return await getReq({ url: "users/verify" });
   };
 
   const onNewUserFormSubmit = async (e, { email, username }) => {
