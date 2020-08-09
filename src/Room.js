@@ -16,7 +16,8 @@ import {
   verifyUser,
   createUser,
   removeUserFromRoom,
-  addUserToRoom
+  addUserToRoom,
+  getRoom
 } from "./actions";
 
 import "./Room.css";
@@ -24,6 +25,7 @@ import "./Room.css";
 function Room() {
   const [room, setRoom] = React.useState({ inRoom: false, roomId: "" });
   const [loginModal, setLoginModal] = React.useState(true);
+  const [usersInRoom, setUsersInRoom] = React.useState([]);
   const [error, setError] = React.useState({ show: false, message: "" });
 
   const ws = React.useRef();
@@ -104,7 +106,13 @@ function Room() {
 
       ws.current.onmessage = e => {
         const message = JSON.parse(e.data);
-        console.log(message);
+        if (message.action === "connect") {
+          setUsersInRoom(message.users);
+        } else if (message.action === "join") {
+          // TODO: compate by userId before merging
+          setUsersInRoom(usersInRoom => [message.user, ...usersInRoom]);
+        }
+        // TODO: check for disconnect
       };
 
       // websocket onclose event listener
@@ -136,14 +144,14 @@ function Room() {
       timeout += timeout; //increment retry interval
       connectInterval = setTimeout(check, Math.min(10000, timeout), user); //call check function after timeout
     }
-  });
+  }, []);
 
   /**
    * utilited by the @function connectWebSocket to check if the connection is close, if so attempts to reconnect
    */
-  const check = () => {
+  const check = user => {
     if (!ws.current || ws.current.readyState === WebSocket.CLOSED) {
-      connectWebSocket(); //check if websocket instance is closed, if so call `connect` function.
+      connectWebSocket(user); //check if websocket instance is closed, if so call `connect` function.
     }
   };
 
@@ -161,21 +169,23 @@ function Room() {
 
           setLoginModal(false);
 
-          // TODO: request to check if user in current room
+          const room = await getRoom();
+          if (room.error) {
+            throw room.error;
+          }
 
-          // user is already in a diffeent room
-          // if (user.inRoom && user.roomId) {
-          //   setRoom({ inRoom: true, roomId: user.roomId });
-          //   return;
-          // }
-
+          // user is in a different room
+          if (room.inRoom && room.roomId !== roomId) {
+            setRoom({ inRoom: true, roomId: room.roomId });
+            return;
+          }
           // user is not in any room
-          // if (!user.inRoom) {
-          //   let response = await addUserToRoom(roomId);
-          //   if (response.error) {
-          //     throw response.error;
-          //   }
-          // }
+          if (!user.inRoom) {
+            let response = await addUserToRoom(roomId);
+            if (response.error) {
+              throw response.error;
+            }
+          }
 
           connectWebSocket(user);
         } else {
@@ -212,11 +222,11 @@ function Room() {
             </Col>
             <Col sm={4}>
               <ListGroup className="User-list">
-                <ListGroup.Item>Cras justo odio</ListGroup.Item>
-                <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-                <ListGroup.Item>Morbi leo risus</ListGroup.Item>
-                <ListGroup.Item>Porta ac consectetur ac</ListGroup.Item>
-                <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+                {usersInRoom.map(user => (
+                  <ListGroup.Item key={user.userId}>
+                    {user.username}
+                  </ListGroup.Item>
+                ))}
               </ListGroup>
             </Col>
           </Row>
