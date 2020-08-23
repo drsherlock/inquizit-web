@@ -67,23 +67,31 @@ function Room() {
       }
 
       Cookies.set("Authorization", user.token);
+
+      user = await verifyUser();
+      if (user.error) {
+        throw user.error;
+      }
+
       setLoginModal(false);
 
-      // TODO: request to check if user in current room
+      const room = await getRoom();
+      if (room.error) {
+        throw room.error;
+      }
 
-      // user is already in a diffeent room
-      // if (user.inRoom && user.roomId) {
-      //   setRoom({ inRoom: true, roomId: user.roomId });
-      //   return;
-      // }
+      // user is in a different room
+      if (room.inRoom && room.roomId !== roomId) {
+        setRoom({ inRoom: true, roomId: room.roomId });
+        return;
+      }
 
-      // user is not in any room
-      // if (!user.inRoom) {
-      //   let response = await addUserToRoom(roomId);
-      //   if (response.error) {
-      //     throw response.error;
-      //   }
-      // }
+      let response = await addUserToRoom(roomId);
+      if (response.error) {
+        throw response.error;
+      }
+
+      connectWebSocket(user);
     } catch (error) {
       setError({ show: true, message: error });
       console.log("Request failed: ", error);
@@ -110,7 +118,18 @@ function Room() {
           setUsersInRoom(message.users);
         } else if (message.action === "join") {
           // TODO: compate by userId before merging
-          setUsersInRoom(usersInRoom => [message.user, ...usersInRoom]);
+          setUsersInRoom(usersInRoom => {
+            for (const user of usersInRoom) {
+              if (user.userId === message.user.userId) {
+                return usersInRoom;
+              }
+            }
+            return [message.user, ...usersInRoom];
+          });
+        } else if (message.action === "disconnect") {
+          setUsersInRoom(usersInRoom =>
+            usersInRoom.filter(user => user.userId !== message.userId)
+          );
         }
         // TODO: check for disconnect
       };
@@ -179,12 +198,10 @@ function Room() {
             setRoom({ inRoom: true, roomId: room.roomId });
             return;
           }
-          // user is not in any room
-          if (!user.inRoom) {
-            let response = await addUserToRoom(roomId);
-            if (response.error) {
-              throw response.error;
-            }
+
+          let response = await addUserToRoom(roomId);
+          if (response.error) {
+            throw response.error;
           }
 
           connectWebSocket(user);
